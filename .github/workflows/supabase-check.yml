@@ -12,16 +12,35 @@ permissions:
 jobs:
   check-database:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check Supabase API
+      - name: Check Supabase Auth
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          set -e
+          set -euo pipefail
+
           curl --fail --silent --show-error \
             --max-time 30 \
             "${SUPABASE_URL}/auth/v1/health" \
             -H "apikey: ${SUPABASE_ANON_KEY}"
+
           echo ""
-          echo "Supabase Auth API is responding"
+          echo "Supabase Auth is working!"
+
+      - name: Check CAR MASR Database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+
+          curl --fail --silent --show-error \
+            --max-time 30 \
+            "${SUPABASE_URL}/rest/v1/car_profiles?select=*&limit=0" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
+
+          echo ""
+          echo "CAR MASR Database is responding!"
