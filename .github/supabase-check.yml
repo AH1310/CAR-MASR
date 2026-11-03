@@ -1,0 +1,26 @@
+
+name: CAR MASR Supabase Check
+
+on:
+  schedule:
+    - cron: '17 3,11,19 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Supabase database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          for attempt in 1 2 3; do
+            curl --fail --silent --show-error \
+              --max-time 20 \
+              "${SUPABASE_URL}/rest/v1/listings?select=id&limit=1" \
+              -H "apikey: ${SUPABASE_ANON_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
+            echo ""
+            sleep 5
+          done
