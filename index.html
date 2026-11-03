@@ -278,6 +278,10 @@ html[data-cm-theme="dark"] .heart.on{color:var(--red)}
 html[data-cm-theme="dark"] .btn:not(.btn-secondary):not(.btn-outline){color:#fff}
 #carMasrThemeToggle{flex:none;font-size:20px;line-height:1;display:grid;place-items:center}
 #carMasrThemeToggle:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+/* Keep the theme switch visible in desktop and mobile header. */
+.header-actions #carMasrThemeToggle{display:grid!important;visibility:visible!important;opacity:1!important;width:40px;min-width:40px;height:40px;flex:0 0 40px;padding:0;position:relative;z-index:1}
+.drawer-links #carMasrDrawerThemeToggle{display:block!important;visibility:visible!important;width:100%;text-align:right;background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--text);font-weight:800}
+@media(max-width:580px){.header-actions{gap:4px}.header-actions #carMasrThemeToggle{width:36px;min-width:36px;height:38px;flex-basis:36px;font-size:18px}.header-inner{gap:6px}}
 </style>
 </head>
 <body>
@@ -338,7 +342,7 @@ html[data-cm-theme="dark"] .btn:not(.btn-secondary):not(.btn-outline){color:#fff
     </div>
   </main>
   <footer class="footer"><div class="wrap"><div class="footer-top"><div><h3>كار مصر · CAR MASR</h3><p>منصة إلكترونية لاستعراض السيارات والمركبات المعروضة للبيع في مصر. تفاصيل المركبة والسعر يقدمها ناشرها؛ يُرجى التحقق منها قبل إتمام أي تعامل.</p></div><div><h3>استكشف</h3><div class="footer-links"><a href="#cars">السيارات المتاحة</a><a href="#categories">فئات المركبات</a><a href="#brands">الماركات</a></div></div><div><h3>التطوير</h3><div class="footer-links"><a href="https://ahmedhafezfrontend-ah13.netlify.app" target="_blank" rel="noopener noreferrer">AH13 · مطور الموقع ↗</a><a href="#about">عن كار مصر</a></div></div></div><div class="footer-bottom"><span>© <span id="year"></span> كار مصر — جميع الحقوق محفوظة</span><a href="https://ahmedhafezfrontend-ah13.netlify.app" target="_blank" rel="noopener noreferrer">تطوير <b>AH13</b></a></div></div></footer>
-  <div id="drawerDim" class="drawer-dim"></div><aside class="drawer" id="mobileDrawer" aria-label="قائمة الموقع" aria-hidden="true"><div class="drawer-top"><a class="site-brand" href="#top"><img src="./logo.png" alt=""><span><strong>كار <em>مصر</em></strong><small>CAR MASR</small></span></a><button id="closeDrawer" class="icon-btn" aria-label="إغلاق">×</button></div><nav class="drawer-links"><a href="#top">⌂ &nbsp; الرئيسية</a><a href="#cars">🚗 &nbsp; السيارات</a><a href="#categories">▦ &nbsp; الأنواع</a><a href="#brands">◉ &nbsp; الماركات</a><button id="drawerAccount" type="button">👤 &nbsp; <span id="drawerAccountText">تسجيل الدخول / إنشاء حساب</span></button><button id="drawerSeller" type="button" class="seller-entry seller-only" aria-haspopup="dialog">＋ إضافة سيارة للبيع</button><button class="drawer-seller-manage seller-only" id="drawerSellerManage" type="button">🚙 سياراتي وإدارة الإعلانات</button><button id="drawerFav" type="button">♡ &nbsp; المفضلة</button><button id="drawerCompare" type="button">⚖️ &nbsp; المقارنة</button><button id="drawerInstallButton" type="button" class="drawer-install" aria-label="طريقة تنزيل كار مصر" aria-haspopup="dialog" title="تنزيل كار مصر"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg></button><a href="https://ahmedhafezfrontend-ah13.netlify.app" target="_blank" rel="noopener noreferrer">↗ &nbsp; AH13 · مطور الموقع</a></nav></aside>
+  <div id="drawerDim" class="drawer-dim"></div><aside class="drawer" id="mobileDrawer" aria-label="قائمة الموقع" aria-hidden="true"><div class="drawer-top"><a class="site-brand" href="#top"><img src="./logo.png" alt=""><span><strong>كار <em>مصر</em></strong><small>CAR MASR</small></span></a><button id="closeDrawer" class="icon-btn" aria-label="إغلاق">×</button></div><nav class="drawer-links"><a href="#top">⌂ &nbsp; الرئيسية</a><a href="#cars">🚗 &nbsp; السيارات</a><a href="#categories">▦ &nbsp; الأنواع</a><a href="#brands">◉ &nbsp; الماركات</a><button id="drawerAccount" type="button">👤 &nbsp; <span id="drawerAccountText">تسجيل الدخول / إنشاء حساب</span></button><button id="drawerSeller" type="button" class="seller-entry seller-only" aria-haspopup="dialog">＋ إضافة سيارة للبيع</button><button class="drawer-seller-manage seller-only" id="drawerSellerManage" type="button">🚙 سياراتي وإدارة الإعلانات</button><button id="carMasrDrawerThemeToggle" type="button" aria-label="تفعيل الوضع الليلي" aria-pressed="false">🌙 &nbsp; الوضع الليلي</button><button id="drawerFav" type="button">♡ &nbsp; المفضلة</button><button id="drawerCompare" type="button">⚖️ &nbsp; المقارنة</button><button id="drawerInstallButton" type="button" class="drawer-install" aria-label="طريقة تنزيل كار مصر" aria-haspopup="dialog" title="تنزيل كار مصر"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg></button><a href="https://ahmedhafezfrontend-ah13.netlify.app" target="_blank" rel="noopener noreferrer">↗ &nbsp; AH13 · مطور الموقع</a></nav></aside>
   <div class="modal-dim" id="modalDim" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal"><div class="modal-head"><h3 id="modalTitle">تفاصيل المركبة</h3><button class="icon-btn" id="closeModal" aria-label="إغلاق">×</button></div><div id="modalContent" class="modal-content"></div></div></div>
   <div class="share-layer" id="shareLayer" role="dialog" aria-modal="true" aria-labelledby="shareHeading" aria-hidden="true">
     <div class="share-shade" id="shareShade"></div>
@@ -1156,17 +1160,26 @@ html[data-cm-theme="dark"] .btn:not(.btn-secondary):not(.btn-outline){color:#fff
       button.setAttribute('title',theme==='dark'?'الوضع النهاري':'الوضع الليلي');
       button.setAttribute('aria-pressed',String(theme==='dark'));
     }
+    var drawerButton=document.getElementById('carMasrDrawerThemeToggle');
+    if(drawerButton){
+      drawerButton.textContent=theme==='dark'?'☀️  الوضع النهاري':'🌙  الوضع الليلي';
+      drawerButton.setAttribute('aria-label',theme==='dark'?'تفعيل الوضع النهاري':'تفعيل الوضع الليلي');
+      drawerButton.setAttribute('aria-pressed',String(theme==='dark'));
+    }
     var color=document.querySelector('meta[name="theme-color"]');
     if(color)color.setAttribute('content',theme==='dark'?'#0b1422':'#081a30');
   }
   function init(){
     apply(theme);
     var button=document.getElementById('carMasrThemeToggle');
-    if(button)button.addEventListener('click',function(){
+    function switchTheme(){
       var next=theme==='dark'?'light':'dark';
       apply(next);
       try {localStorage.setItem(storageKey,next);} catch(e) {}
-    });
+    }
+    if(button)button.addEventListener('click',switchTheme);
+    var drawerButton=document.getElementById('carMasrDrawerThemeToggle');
+    if(drawerButton)drawerButton.addEventListener('click',switchTheme);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
   else init();
