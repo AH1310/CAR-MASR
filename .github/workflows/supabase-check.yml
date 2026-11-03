@@ -24,3 +24,7 @@ jobs:
             echo ""
             sleep 5
           done
+
+
+
+# CAR MASR automatic database check
