@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة الأدمن المستقلة - الإشعارات والشكاوى والاقتراحات والتمييز الأسبوعي</title>
+  <title>المنصة الكاملة - الإشعارات والشكاوى والاقتراحات والتمييز الأسبوعي</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -153,7 +153,7 @@
       width: auto;
       background: var(--accent);
       color: #fff;
-      padding: 10px 16px;
+      padding: 11px 18px;
       margin: 0;
     }
 
@@ -184,6 +184,10 @@
       border-radius: 10px;
       padding: 14px;
       margin-bottom: 12px;
+    }
+
+    .notif-box.unread {
+      border-right: 4px solid var(--accent);
     }
 
     .spotlight-box {
@@ -217,83 +221,81 @@
 <body>
   <div class="container">
 
-    <!-- شريط التنقل العلوى وحالة تسجيل الدخول -->
+    <!-- الشريط العلوي: تسجيل الدخول / المعرف (يفتح الأدمن تلقائياً إذا كان البريد والمعرف هما بريد ومعرف الأدمن) + زر الشكاوى والاقتراحات لتطوير الموقع -->
     <div class="card">
       <div class="row">
         <div>
-          <h1 style="margin:0; font-size:1.35rem; color:#4ade80;">🛡️ لوحة تحكم الأدمن الكاملة</h1>
-          <span id="adminSessionInfo" class="muted">غير مسجل دخول حالياً</span>
+          <strong>حالة الدخول / المعرف:</strong>
+          <span id="currentUserBadge" class="badge">user_101</span>
+          <span id="adminNavBadge" class="badge badge-gold hidden">وضع الأدمن مفعل</span>
+          <span class="muted" style="margin-right:8px;">| السيرفر والمفاتيح موحدة</span>
         </div>
         <div class="row" style="gap:8px;">
-          <a href="./index.html" style="text-decoration:none;">
-            <button type="button" class="hero-btn">العودة إلى Index</button>
-          </a>
-          <button type="button" id="logoutBtnTop" class="btn-copy btn-red hidden" onclick="logoutAdmin()">تسجيل خروج</button>
+          <input type="email" id="loginEmailInput" placeholder="البريد الإلكتروني (اختياري)" style="width:210px; margin:0;" />
+          <input type="text" id="userIdInput" value="user_101" placeholder="المعرف / User ID" style="width:220px; margin:0;" />
+          <button class="btn-copy" onclick="copyText(document.getElementById('userIdInput').value)">نسخ المعرف</button>
+          <button class="btn-green" style="width:auto; margin:0;" onclick="handleLoginOrUpdate()">دخول / تحديث</button>
+          <button class="hero-btn" onclick="openFeedbackSection()">الشكاوي والاقتراحات لتطوير الموقع</button>
+          <button id="openAdminPanelBtn" class="btn-copy hidden" onclick="scrollToAdminSection()">لوحة الأدمن</button>
         </div>
       </div>
-
-      <!-- نموذج تسجيل دخول الأدمن بالبريد والمعرف -->
-      <div id="adminLoginCard" style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
-        <h3>تسجيل دخول الأدمن (بالبريد الإلكتروني والمعرف)</h3>
-        <form id="adminLoginForm">
-          <input type="email" id="adminEmailInput" placeholder="البريد الإلكتروني للأدمن" required />
-          <input type="text" id="adminCodeInput" placeholder="المعرف السري للأدمن" required />
-          <button type="submit" class="btn-green" style="width:auto;">فتح لوحة الأدمن</button>
-        </form>
+      <div class="muted" style="margin-top:8px;">
+        سجّل ببريدك ومعرفك كأي مستخدم عادي؛ إذا تطابق البريد والمعرف مع حساب الأدمن سيتم فتح لوحة الأدمن تلقائياً دون زر منفصل باسم "دخول الأدمن".
       </div>
     </div>
 
-    <!-- جسم لوحة الأدمن الكامل (يظهر بعد تسجيل الدخول) -->
-    <div id="adminDashboardBody" class="hidden">
-
-      <!-- ملخص وإحصائيات سريعة -->
-      <div class="card">
-        <div class="row" style="margin-bottom:14px;">
-          <h2 style="margin:0;">📊 ملخص الحالة والإحصائيات</h2>
-          <div class="row" style="gap:8px;">
-            <button class="btn-copy" onclick="copyAdminSummary()">نسخ ملخص الأدمن</button>
-            <button class="btn-copy" onclick="refreshAllAdminData()">تحديث البيانات</button>
-          </div>
+    <!-- لوحة الأدمن (تظهر تلقائياً عند تسجيل الدخول ببريد ومعرف الأدمن) -->
+    <div id="adminPanel" class="card hidden" style="border-color:var(--green);">
+      <div class="row" style="margin-bottom:16px;">
+        <div>
+          <h2 style="margin:0; color:#4ade80;">لوحة تحكم الأدمن الكاملة</h2>
+          <span id="adminSessionInfo" class="muted"></span>
         </div>
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="muted">عناصر التمييز الأسبوعي</div>
-            <div id="statSpotlightsCount" class="stat-num">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="muted">إجمالي الإشعارات المرسلة</div>
-            <div id="statNotificationsCount" class="stat-num">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="muted">الشكاوى والاقتراحات والتطوير</div>
-            <div id="statTicketsCount" class="stat-num">0</div>
-          </div>
+        <div class="row" style="gap:8px;">
+          <button class="btn-copy" onclick="copyAdminSummary()">نسخ ملخص الأدمن</button>
+          <button class="btn-copy btn-red" onclick="logoutAdmin()">تسجيل خروج الأدمن</button>
+        </div>
+      </div>
+
+      <!-- إحصائيات سريعة للأدمن -->
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="muted">عناصر التمييز الأسبوعي</div>
+          <div id="statSpotlightsCount" class="stat-num">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="muted">إجمالي الإشعارات المرسلة</div>
+          <div id="statNotificationsCount" class="stat-num">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="muted">الشكاوى والاقتراحات وتطوير الموقع</div>
+          <div id="statTicketsCount" class="stat-num">0</div>
         </div>
       </div>
 
       <!-- 1) إدارة التمييز الأسبوعي والعناصر القابلة للتعديل والرجوع إليها -->
-      <div class="card">
-        <div class="row" style="margin-bottom:12px;">
-          <h2 style="margin:0; color:#facc15;">🏆 إدارة التمييز الأسبوعي والرجوع إليه</h2>
+      <div class="spotlight-box" style="margin-bottom:20px;">
+        <div class="row" style="margin-bottom:10px;">
+          <h3 style="margin:0; color:#facc15;">إدارة التمييز الأسبوعي والرجوع إليه</h3>
           <button class="btn-copy" onclick="copySpotlightComposer()">نسخ نص التمييز</button>
         </div>
         <form id="adminSpotlightForm">
           <input type="hidden" id="editingSpotlightId" value="" />
           <input type="text" id="spotlightTitle" placeholder="عنوان التمييز الأسبوعي أو الفقرة المميزة" required />
-          <input type="text" id="spotlightSubtitle" placeholder="الوسم أو الفترة (مثال: الأسبوع 1 - شارك تانك / المسابقة)" />
+          <input type="text" id="spotlightSubtitle" placeholder="الوسم أو الفترة (مثال: الأسبوع الأول - عرض المسابقة)" />
           <textarea id="spotlightDescription" rows="3" placeholder="تفاصيل التمييز الأسبوعي أو النقاط البارزة..." required></textarea>
           <div class="row" style="gap:8px;">
             <button type="submit" id="spotlightSubmitBtn" class="btn-gold" style="width:auto;">حفظ في التمييز الأسبوعي</button>
             <button type="button" class="btn-copy" onclick="resetSpotlightForm()">تفريغ / إلغاء التعديل</button>
           </div>
         </form>
-        <div id="adminSpotlightsList" style="margin-top:16px;">جاري تحميل العناصر...</div>
+        <div id="adminSpotlightsList" style="margin-top:14px;">جاري تحميل العناصر...</div>
       </div>
 
-      <!-- 2) إرسال إشعارات للعامة أو لأشخاص محددين وإدارتها -->
-      <div class="card">
-        <div class="row" style="margin-bottom:12px;">
-          <h2 style="margin:0;">🔔 إرسال وإدارة الإشعارات (للجميع أو لمستخدمين محددين)</h2>
+      <!-- 2) إرسال إشعار للعامة أو لأشخاص محددين وإدارتها -->
+      <div class="notif-box" style="padding:16px; margin-bottom:20px;">
+        <div class="row" style="margin-bottom:10px;">
+          <h3 style="margin:0;">إرسال إشعار جديد (عام أو مخصص)</h3>
           <button class="btn-copy" onclick="copyNotifComposer()">نسخ نص الإشعار</button>
         </div>
         <form id="adminNotifForm">
@@ -311,18 +313,18 @@
           />
           <button type="submit" class="btn-green">نشر الإشعار</button>
         </form>
-        <div id="adminNotificationsList" style="margin-top:16px;">جاري تحميل سجل الإشعارات...</div>
+        <div id="adminNotificationsList" style="margin-top:14px;">جاري تحميل سجل الإشعارات...</div>
       </div>
 
-      <!-- 3) متابعة وتحديث وحذف الشكاوى واقتراحات التطوير -->
-      <div class="card">
+      <!-- 3) متابعة كل الشكاوى والاقتراحات وتطوير الموقع -->
+      <div>
         <div class="row" style="margin-bottom:12px;">
-          <h2 style="margin:0;">📋 الشكاوى واقتراحات التطوير للموقع</h2>
+          <h3 style="margin:0;">متابعة الشكاوى والاقتراحات لتطوير الموقع</h3>
           <div class="row" style="gap:8px;">
             <select id="adminFilterCategory" onchange="loadAdminTickets()" style="width:auto; margin:0;">
               <option value="all">الكل</option>
-              <option value="complaint">شكاوى</option>
-              <option value="suggestion">اقتراحات</option>
+              <option value="complaint">الشكاوى</option>
+              <option value="suggestion">الاقتراحات</option>
               <option value="improvement">تطوير للموقع</option>
             </select>
             <button class="btn-copy" onclick="copyAllTickets()">نسخ كل الرسائل</button>
@@ -330,7 +332,44 @@
         </div>
         <div id="adminTicketsContainer">جاري التحميل...</div>
       </div>
+    </div>
 
+    <!-- قسم التمييز الأسبوعي والبرزنتيشن / التحديثات المميزة -->
+    <div class="card">
+      <div class="row" style="margin-bottom:12px;">
+        <h2 style="margin:0;">🏆 التمييز الأسبوعي والعناصر المميزة</h2>
+        <button class="btn-copy" onclick="copyAllSpotlights()">نسخ الكل</button>
+      </div>
+      <div id="spotlightsContainer">جاري تحميل التمييز الأسبوعي...</div>
+    </div>
+
+    <!-- قسم الإشعارات -->
+    <div class="card">
+      <div class="row" style="margin-bottom:12px;">
+        <h2 style="margin:0;">🔔 الإشعارات (<span id="unreadCount">0</span> جديد)</h2>
+        <button class="btn-copy" onclick="copyAllNotifications()">نسخ كل الإشعارات</button>
+      </div>
+      <div id="notificationsContainer">جاري تحميل الإشعارات...</div>
+    </div>
+
+    <!-- قسم الشكاوى والاقتراحات لتطوير الموقع -->
+    <div id="feedbackSection" class="card">
+      <div class="row" style="margin-bottom:12px;">
+        <h2 style="margin:0;">الشكاوي والاقتراحات لتطوير الموقع</h2>
+        <button class="btn-copy" onclick="copyFeedbackDraft()">نسخ نص الرسالة</button>
+      </div>
+      <form id="feedbackForm">
+        <input type="text" id="senderName" placeholder="الاسم" required />
+        <input type="email" id="senderEmail" placeholder="البريد الإلكتروني (اختياري)" />
+        <select id="feedbackCategory" required>
+          <option value="complaint">شكوى</option>
+          <option value="suggestion">اقتراح</option>
+          <option value="improvement">تطوير للموقع</option>
+        </select>
+        <input type="text" id="feedbackSubject" placeholder="عنوان الشكوى أو الاقتراح" required />
+        <textarea id="feedbackDetails" rows="4" placeholder="اكتب التفاصيل هنا..." required></textarea>
+        <button type="submit">إرسال</button>
+      </form>
     </div>
   </div>
 
@@ -338,23 +377,27 @@
 
   <script>
     // =========================================================
-    // نفس بيانات السيرفر والمفاتيح الموحدة مع Index
+    // الإعدادات الموحدة للسيرفر والمفاتيح وحساب الأدمن
     // =========================================================
-    const ADMIN_CONFIG = {
+    const APP_CONFIG = {
       SUPABASE_URL: "YOUR_SUPABASE_URL",
       SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY",
-      ADMIN_EMAIL: "admin@example.com",
-      ADMIN_CODE: "ADMIN_SECRET_CODE"
+      ADMIN_EMAIL: "ah10med2013@gmail.com",
+      ADMIN_CODE: "08430793-5a0e-44ed-a8ee-fb9b0d5b5354",
+      DEFAULT_USER_ID: "user_101"
     };
 
     const supabaseClient = supabase.createClient(
-      ADMIN_CONFIG.SUPABASE_URL,
-      ADMIN_CONFIG.SUPABASE_ANON_KEY
+      APP_CONFIG.SUPABASE_URL,
+      APP_CONFIG.SUPABASE_ANON_KEY
     );
 
+    let currentUserId = APP_CONFIG.DEFAULT_USER_ID;
+    let currentUserEmail = "";
     let isAdminLoggedIn = false;
-    let spotlightsList = [];
     let allNotifications = [];
+    let visibleNotifications = [];
+    let spotlightsList = [];
     let adminTickets = [];
 
     const categoryLabels = {
@@ -381,74 +424,103 @@
       }[m]));
     }
 
-    function updateStats() {
-      document.getElementById("statSpotlightsCount").textContent = String(spotlightsList.length);
-      document.getElementById("statNotificationsCount").textContent = String(allNotifications.length);
-      document.getElementById("statTicketsCount").textContent = String(adminTickets.length);
+    function updateAdminStats() {
+      const sEl = document.getElementById("statSpotlightsCount");
+      const nEl = document.getElementById("statNotificationsCount");
+      const tEl = document.getElementById("statTicketsCount");
+      if (sEl) sEl.textContent = String(spotlightsList.length);
+      if (nEl) nEl.textContent = String(allNotifications.length);
+      if (tEl) tEl.textContent = String(adminTickets.length);
     }
 
-    function activateAdminView(email, code) {
-      isAdminLoggedIn = true;
-      document.getElementById("adminLoginCard").classList.add("hidden");
-      document.getElementById("adminDashboardBody").classList.remove("hidden");
-      document.getElementById("logoutBtnTop").classList.remove("hidden");
-      document.getElementById("adminSessionInfo").textContent =
-        `مسجل كـ: ${email} | المعرف: ${code}`;
-      refreshAllAdminData();
-    }
+    function applyAdminState(active, email = "") {
+      isAdminLoggedIn = active;
+      const panel = document.getElementById("adminPanel");
+      const badge = document.getElementById("adminNavBadge");
+      const navBtn = document.getElementById("openAdminPanelBtn");
+      const info = document.getElementById("adminSessionInfo");
 
-    document.getElementById("adminLoginForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("adminEmailInput").value.trim().toLowerCase();
-      const code = document.getElementById("adminCodeInput").value.trim();
-
-      if (
-        email === ADMIN_CONFIG.ADMIN_EMAIL.toLowerCase() &&
-        code === ADMIN_CONFIG.ADMIN_CODE
-      ) {
-        sessionStorage.setItem("admin_standalone_auth", JSON.stringify({ email, code }));
-        activateAdminView(email, code);
-        showToast("تم تسجيل دخول الأدمن");
+      if (active) {
+        panel.classList.remove("hidden");
+        badge.classList.remove("hidden");
+        navBtn.classList.remove("hidden");
+        info.textContent = `مسجل كأدمن: ${email || APP_CONFIG.ADMIN_EMAIL} | المعرف: ${APP_CONFIG.ADMIN_CODE}`;
+        renderAdminSpotlights();
+        renderAdminNotifications();
+        loadAdminTickets();
+        updateAdminStats();
       } else {
-        alert("البريد الإلكتروني أو المعرف غير صحيح");
+        panel.classList.add("hidden");
+        badge.classList.add("hidden");
+        navBtn.classList.add("hidden");
+        info.textContent = "";
       }
-    });
+    }
+
+    function handleLoginOrUpdate() {
+      const email = document.getElementById("loginEmailInput").value.trim().toLowerCase();
+      const code = document.getElementById("userIdInput").value.trim();
+      if (!code) return;
+
+      currentUserId = code;
+      currentUserEmail = email;
+      document.getElementById("currentUserBadge").textContent = currentUserId;
+      filterAndRenderUserNotifications();
+
+      const matchesAdmin =
+        email === APP_CONFIG.ADMIN_EMAIL.toLowerCase() &&
+        code === APP_CONFIG.ADMIN_CODE;
+
+      if (matchesAdmin) {
+        sessionStorage.setItem("unified_admin_session", JSON.stringify({ email, code }));
+        applyAdminState(true, email);
+        showToast("تم التحقق من حساب الأدمن وفتح لوحة الأدمن");
+        document.getElementById("adminPanel").scrollIntoView({ behavior: "smooth" });
+      } else {
+        sessionStorage.removeItem("unified_admin_session");
+        applyAdminState(false);
+        showToast("تم تحديث بيانات المستخدم");
+      }
+    }
 
     function logoutAdmin() {
-      isAdminLoggedIn = false;
-      sessionStorage.removeItem("admin_standalone_auth");
-      document.getElementById("adminDashboardBody").classList.add("hidden");
-      document.getElementById("logoutBtnTop").classList.add("hidden");
-      document.getElementById("adminLoginCard").classList.remove("hidden");
-      document.getElementById("adminSessionInfo").textContent = "غير مسجل دخول حالياً";
-      document.getElementById("adminLoginForm").reset();
+      sessionStorage.removeItem("unified_admin_session");
+      applyAdminState(false);
       resetSpotlightForm();
-      showToast("تم تسجيل الخروج");
+      showToast("تم إغلاق وضع الأدمن");
     }
 
     function restoreSession() {
       try {
-        const saved = JSON.parse(sessionStorage.getItem("admin_standalone_auth") || "null");
+        const saved = JSON.parse(sessionStorage.getItem("unified_admin_session") || "null");
         if (
           saved &&
           saved.email &&
-          saved.email.toLowerCase() === ADMIN_CONFIG.ADMIN_EMAIL.toLowerCase() &&
-          saved.code === ADMIN_CONFIG.ADMIN_CODE
+          saved.email.toLowerCase() === APP_CONFIG.ADMIN_EMAIL.toLowerCase() &&
+          saved.code === APP_CONFIG.ADMIN_CODE
         ) {
-          activateAdminView(saved.email, saved.code);
+          currentUserId = saved.code;
+          currentUserEmail = saved.email;
+          document.getElementById("loginEmailInput").value = saved.email;
+          document.getElementById("userIdInput").value = saved.code;
+          document.getElementById("currentUserBadge").textContent = currentUserId;
+          applyAdminState(true, saved.email);
         }
       } catch (_) {}
     }
 
-    function refreshAllAdminData() {
-      if (!isAdminLoggedIn) return;
-      loadSpotlights();
-      loadNotifications();
-      loadAdminTickets();
+    function openFeedbackSection() {
+      const sec = document.getElementById("feedbackSection");
+      sec.scrollIntoView({ behavior: "smooth" });
+      document.getElementById("senderName").focus();
+    }
+
+    function scrollToAdminSection() {
+      document.getElementById("adminPanel").scrollIntoView({ behavior: "smooth" });
     }
 
     // =========================================================
-    // 1) التمييز الأسبوعي والرجوع إليه
+    // التمييز الأسبوعي (قابل للتعديل والرجوع إليه في أي وقت)
     // =========================================================
     async function loadSpotlights() {
       const { data, error } = await supabaseClient
@@ -457,20 +529,56 @@
         .order("created_at", { ascending: false });
 
       if (error) {
-        document.getElementById("adminSpotlightsList").innerHTML =
-          `<p class="muted">خطأ: ${escapeHtml(error.message)}</p>`;
+        document.getElementById("spotlightsContainer").innerHTML =
+          `<p class="muted">خطأ في تحميل التمييز الأسبوعي: ${escapeHtml(error.message)}</p>`;
         return;
       }
 
       spotlightsList = data || [];
-      renderSpotlights();
-      updateStats();
+      renderPublicSpotlights();
+      if (isAdminLoggedIn) {
+        renderAdminSpotlights();
+        updateAdminStats();
+      }
     }
 
-    function renderSpotlights() {
+    function renderPublicSpotlights() {
+      const box = document.getElementById("spotlightsContainer");
+      const activeItems = spotlightsList.filter((item) => item.is_active !== false);
+
+      if (!activeItems.length) {
+        box.innerHTML = `<p class="muted">لا توجد عناصر تمييز أسبوعي مفعلة حالياً.</p>`;
+        return;
+      }
+
+      box.innerHTML = activeItems
+        .map((item) => {
+          const copyPayload = `${item.title}${item.subtitle ? " (" + item.subtitle + ")" : ""}
+${item.description}`;
+          return `
+            <div class="spotlight-box">
+              <div class="row">
+                <div>
+                  <span class="badge badge-gold">تمييز أسبوعي</span>
+                  <strong>${escapeHtml(item.title)}</strong>
+                  ${item.subtitle ? `<span class="muted"> — ${escapeHtml(item.subtitle)}</span>` : ""}
+                </div>
+                <button class="btn-copy" onclick='copyText(${JSON.stringify(copyPayload)})'>نسخ</button>
+              </div>
+              <p style="margin:8px 0;">${escapeHtml(item.description)}</p>
+              <span class="muted">${new Date(item.created_at).toLocaleString("ar-EG")}</span>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function renderAdminSpotlights() {
       const box = document.getElementById("adminSpotlightsList");
+      if (!box) return;
+
       if (!spotlightsList.length) {
-        box.innerHTML = `<p class="muted">لا توجد عناصر تمييز أسبوعي حتى الآن.</p>`;
+        box.innerHTML = `<p class="muted">لا توجد عناصر تمييز مسجلة بعد.</p>`;
         return;
       }
 
@@ -548,29 +656,38 @@ ${d}`);
         : await supabaseClient.from("weekly_spotlights").insert(payload);
 
       if (res.error) {
-        alert("خطأ أثناء الحفظ: " + res.error.message);
+        alert("خطأ أثناء حفظ التمييز الأسبوعي: " + res.error.message);
         return;
       }
 
       resetSpotlightForm();
-      showToast(editId ? "تم تحديث العنصر" : "تمت إضافة العنصر");
+      showToast(editId ? "تم تحديث التمييز الأسبوعي" : "تمت إضافة التمييز الأسبوعي");
       loadSpotlights();
     });
 
     async function toggleSpotlightActive(id, nextState) {
       await supabaseClient.from("weekly_spotlights").update({ is_active: nextState }).eq("id", id);
-      showToast(nextState ? "تم التفعيل" : "تم الإخفاء");
+      showToast(nextState ? "تم تفعيل العنصر" : "تم إخفاء العنصر");
       loadSpotlights();
     }
 
     async function deleteSpotlight(id) {
       await supabaseClient.from("weekly_spotlights").delete().eq("id", id);
-      showToast("تم الحذف");
+      showToast("تم حذف العنصر");
       loadSpotlights();
     }
 
+    function copyAllSpotlights() {
+      const txt = spotlightsList
+        .map((s) => `🏆 ${s.title}${s.subtitle ? " (" + s.subtitle + ")" : ""}: ${s.description}`)
+        .join("
+-----------------
+");
+      copyText(txt);
+    }
+
     // =========================================================
-    // 2) الإشعارات (للجميع أو لناس محددة)
+    // الإشعارات (عامة أو مخصصة لمعرفات مستخدمين محددة)
     // =========================================================
     async function loadNotifications() {
       const { data, error } = await supabaseClient
@@ -579,18 +696,70 @@ ${d}`);
         .order("created_at", { ascending: false });
 
       if (error) {
-        document.getElementById("adminNotificationsList").innerHTML =
+        document.getElementById("notificationsContainer").innerHTML =
           `<p class="muted">خطأ: ${escapeHtml(error.message)}</p>`;
         return;
       }
 
       allNotifications = data || [];
+      filterAndRenderUserNotifications();
+      if (isAdminLoggedIn) {
+        renderAdminNotifications();
+        updateAdminStats();
+      }
+    }
+
+    function filterAndRenderUserNotifications() {
+      visibleNotifications = allNotifications.filter((n) => {
+        if (n.target_type === "public") return true;
+        return Array.isArray(n.target_user_ids) && n.target_user_ids.includes(currentUserId);
+      });
       renderNotifications();
-      updateStats();
     }
 
     function renderNotifications() {
+      const box = document.getElementById("notificationsContainer");
+      if (!visibleNotifications.length) {
+        box.innerHTML = `<p class="muted">لا توجد إشعارات حالياً.</p>`;
+        document.getElementById("unreadCount").textContent = "0";
+        return;
+      }
+
+      let unread = 0;
+      box.innerHTML = visibleNotifications
+        .map((n) => {
+          const isRead = Array.isArray(n.read_by) && n.read_by.includes(currentUserId);
+          if (!isRead) unread++;
+          const targetLabel = n.target_type === "public" ? "للجميع" : "مخصص لك";
+          const copyPayload = `${n.title}
+${n.message}`;
+          return `
+            <div class="notif-box ${isRead ? "" : "unread"}">
+              <div class="row">
+                <div>
+                  <strong>${escapeHtml(n.title)}</strong>
+                  <span class="badge">${targetLabel}</span>
+                  ${!isRead ? '<span class="badge" style="background:#0ea5e9;">جديد</span>' : ""}
+                </div>
+                <div class="row" style="gap:6px;">
+                  <button class="btn-copy" onclick='copyText(${JSON.stringify(copyPayload)})'>نسخ</button>
+                  ${!isRead ? `<button class="btn-copy" onclick="markNotificationRead('${n.id}')">تمت القراءة</button>` : ""}
+                </div>
+              </div>
+              <p style="margin:8px 0;">${escapeHtml(n.message)}</p>
+              <span class="muted">${new Date(n.created_at).toLocaleString("ar-EG")}</span>
+            </div>
+          `;
+        })
+        .join("");
+
+      document.getElementById("unreadCount").textContent = String(unread);
+    }
+
+    function renderAdminNotifications() {
       const box = document.getElementById("adminNotificationsList");
+      if (!box) return;
+
       if (!allNotifications.length) {
         box.innerHTML = `<p class="muted">لا توجد إشعارات مرسلة بعد.</p>`;
         return;
@@ -628,6 +797,23 @@ ${n.message}`;
       await supabaseClient.from("notifications").delete().eq("id", id);
       showToast("تم حذف الإشعار");
       loadNotifications();
+    }
+
+    async function markNotificationRead(id) {
+      const item = visibleNotifications.find((x) => x.id === id);
+      const readList = Array.isArray(item?.read_by) ? item.read_by : [];
+      if (readList.includes(currentUserId)) return;
+      await supabaseClient
+        .from("notifications")
+        .update({ read_by: [...readList, currentUserId] })
+        .eq("id", id);
+      loadNotifications();
+    }
+
+    function copyAllNotifications() {
+      const txt = visibleNotifications.map((n) => `• ${n.title}: ${n.message}`).join("
+");
+      copyText(txt);
     }
 
     function toggleTargetUsersInput() {
@@ -677,8 +863,37 @@ ${m}`);
     });
 
     // =========================================================
-    // 3) الشكاوى واقتراحات التطوير للموقع
+    // الشكاوى والاقتراحات لتطوير الموقع
     // =========================================================
+    function copyFeedbackDraft() {
+      const cat = categoryLabels[document.getElementById("feedbackCategory").value] || "";
+      const subj = document.getElementById("feedbackSubject").value;
+      const det = document.getElementById("feedbackDetails").value;
+      copyText(`[${cat}] ${subj}
+${det}`);
+    }
+
+    document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const { error } = await supabaseClient.from("feedback_tickets").insert({
+        sender_name: document.getElementById("senderName").value.trim(),
+        sender_email: document.getElementById("senderEmail").value.trim() || null,
+        user_id: currentUserId,
+        category: document.getElementById("feedbackCategory").value,
+        subject: document.getElementById("feedbackSubject").value.trim(),
+        details: document.getElementById("feedbackDetails").value.trim()
+      });
+
+      if (error) {
+        alert("حدث خطأ أثناء الإرسال: " + error.message);
+        return;
+      }
+
+      e.target.reset();
+      showToast("تم إرسال رسالتك بنجاح");
+      if (isAdminLoggedIn) loadAdminTickets();
+    });
+
     async function loadAdminTickets() {
       if (!isAdminLoggedIn) return;
       const filter = document.getElementById("adminFilterCategory").value;
@@ -697,7 +912,7 @@ ${m}`);
       }
 
       adminTickets = data || [];
-      updateStats();
+      updateAdminStats();
       if (!adminTickets.length) {
         document.getElementById("adminTicketsContainer").innerHTML =
           `<p class="muted">لا توجد شكاوى أو اقتراحات حالياً.</p>`;
@@ -766,28 +981,29 @@ ${t.details}`;
       );
     }
 
+    // =========================================================
+    // اشتراكات الوقت الفعلي (Realtime)
+    // =========================================================
     supabaseClient
-      .channel("admin_standalone:notifications")
-      .on("postgres_changes", { event: "*", schema: "public", table: "notifications" }, () => {
-        if (isAdminLoggedIn) loadNotifications();
-      })
+      .channel("realtime:notifications")
+      .on("postgres_changes", { event: "*", schema: "public", table: "notifications" }, loadNotifications)
       .subscribe();
 
     supabaseClient
-      .channel("admin_standalone:spotlights")
-      .on("postgres_changes", { event: "*", schema: "public", table: "weekly_spotlights" }, () => {
-        if (isAdminLoggedIn) loadSpotlights();
-      })
+      .channel("realtime:weekly_spotlights")
+      .on("postgres_changes", { event: "*", schema: "public", table: "weekly_spotlights" }, loadSpotlights)
       .subscribe();
 
     supabaseClient
-      .channel("admin_standalone:tickets")
+      .channel("realtime:feedback_tickets")
       .on("postgres_changes", { event: "*", schema: "public", table: "feedback_tickets" }, () => {
         if (isAdminLoggedIn) loadAdminTickets();
       })
       .subscribe();
 
     restoreSession();
+    loadSpotlights();
+    loadNotifications();
   </script>
 </body>
 </html>
